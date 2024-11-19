@@ -1,0 +1,260 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int    @id @default(autoincrement())
+  name      String
+  phoneNumber String
+  email      String
+  password    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model VerificationToken {
+  id         Int    @id @default(autoincrement())
+  identifier String
+  token        String
+  expires    DateTime
+
+}
+
+model Account {
+  id        Int    @id @default(autoincrement())
+  userId    Int
+  provider   String
+  providerAccountId String
+  refresh_token String?
+  access_token String?
+  access_token_expires String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Tenet{
+  id        Int    @id @default(autoincrement())
+  name      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model TenetUser {
+  id        Int    @id @default(autoincrement())
+  tenetId   Int
+  userId    Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model TenetUserRole {
+  id        Int    @id @default(autoincrement())
+  tenetId   Int
+  userId    Int
+  role      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model TenetUserRolePermission {
+  id        Int    @id @default(autoincrement())
+  tenetId   Int
+  userId    Int
+  role      String
+  permission String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model TenetUserRolePermissionAction {
+  id        Int    @id @default(autoincrement())
+  tenetId   Int
+  userId    Int
+  role      String
+  permission String
+  action    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model TenetUserRolePermissionActionCondition {
+  id        Int    @id @default(autoincrement())
+  tenetId   Int
+  userId    Int
+  role      String
+  permission String
+  action    String
+  condition  String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// CarProvider model
+model CarProvider {
+  id       Int      @id @default(autoincrement())
+  // Add fields for CarProvider model as needed (e.g., name, email, password)
+  cars     Car[]    // Relation to cars listed by this provider
+}
+// Car model
+model Car {
+ id              Int        @id @default(autoincrement())
+ name            String?
+ brand           String?
+ model           String?
+ interiorColor   String?
+ exteriorColor   String?
+ year            String?
+ category        String?
+ location        String?
+ vehicleType     String?
+ featuredCar     Boolean    @default(false)
+ status          String?
+ description     String?
+ carProviderId   Int?       // Add this line
+ provider        CarProvider? @relation(fields: [carProviderId], references: [id]) // Reference to CarProvider model
+ carImages       CarImage[]     // Reference to CarImage model
+ packageDetails PackageDetail? // Reference to PackageDetail model
+ carFeatures     CarFeature?    // Reference to CarFeature model
+ createdAt       DateTime     @default(now())
+ updatedAt       DateTime     @updatedAt
+}
+
+
+// CarImage model
+model CarImage {
+  id        Int      @id @default(autoincrement())
+  imageUrl  String?
+  imageType String?
+  car       Car?     // Reference to Car model
+}
+
+// PackageDetail model
+model PackageDetail {
+  id                 Int      @id @default(autoincrement())
+  securityDeposit    String?
+  ExcessClaimAmount String?
+  creditCard         String?
+  dailypackage       DailyPackage?
+  weeklypackage      WeeklyPackage?
+  monthlypackage     MonthlyPackage?
+}
+
+// DailyPackage model
+model DailyPackage {
+  id                    Int      @id @default(autoincrement())
+  dprice                String?
+  dnumOFFreeKMs         String?
+  dpriceAfterFreeKMs    String?
+  dfreeCancellation     Boolean?
+  dcancellationCharge   String?
+  ddeliveryCharges      String?
+  dminimumDays          String?
+}
+
+// WeeklyPackage model
+model WeeklyPackage {
+  id                    Int      @id @default(autoincrement())
+  wprice                String?
+  wnumOFFreeKMs         String?
+  wpriceAfterFreeKMs    String?
+  wfreeCancellation     Boolean?
+  wcancellationCharge   String?
+  wdeliveryCharges      String?
+}
+
+
+
+// OneMonthPrice model
+model OneMonthPrice {
+  id                     Int      @id @default(autoincrement())
+  m1price                String?
+  m1numOFFreeKMs         String?
+  m1priceAfterFreeKMs    String?
+  m1freeCancellation     Boolean?
+  m1cancellationCharge   String?
+  m1deliveryCharges      String?
+  monthlyPackage         MonthlyPackage?  @relation(fields: [monthlyPackageId], references: [id])
+  monthlyPackageId       Int? @unique
+}
+
+// ThreeMonthPrice model
+model ThreeMonthPrice {
+  id                     Int      @id @default(autoincrement())
+  m3price                String?
+  m3numOFFreeKMs         String?
+  m3priceAfterFreeKMs    String?
+  m3freeCancellation     Boolean?
+  m3cancellationCharge   String?
+  m3deliveryCharges      String?
+  monthlyPackage         MonthlyPackage?  @relation(fields: [monthlyPackageId], references: [id])
+  monthlyPackageId       Int?
+}
+
+// SixMonthPrice model
+model SixMonthPrice {
+  id                     Int      @id @default(autoincrement())
+  m6price                String?
+  m6numOFFreeKMs         String?
+  m6priceAfterFreeKMs    String?
+  m6freeCancellation     Boolean?
+  m6deliveryCharges      String?
+  monthlyPackage         MonthlyPackage?  @relation(fields: [monthlyPackageId], references: [id])
+  monthlyPackageId       Int?
+}
+
+// NineMonthPrice model
+model NineMonthPrice {
+  id                     Int      @id @default(autoincrement())
+  m9price                String?
+  m9numOFFreeKMs         String?
+  m9priceAfterFreeKMs    String?
+  m9cancellationCharge   String?
+  m9deliveryCharges      String?
+  monthlyPackage         MonthlyPackage?  @relation(fields: [monthlyPackageId], references: [id])
+  monthlyPackageId       Int?
+}
+
+// MonthlyPackage model
+model MonthlyPackage {
+  id                     Int @id @default(autoincrement())
+  oneMonthPriceId        Int    
+  threeMonthPriceId       Int    
+  sixMonthPriceId        Int    
+  nineMonthPriceId       Int   
+  monthlyPackage         Car?    @relation(fields: [carId], references: [id])
+  oneMonthPrice          OneMonthPrice?   @relation(fields: [oneMonthPriceId], references: [id])
+  threeMonthPrice        ThreeMonthPrice? @relation(fields: [threeMonthPriceId], references: [id])
+  sixMonthPrice          SixMonthPrice?   @relation(fields: [sixMonthPriceId], references: [id])
+  nineMonthPrice         NineMonthPrice?  @relation(fields: [nineMonthPriceId], references: [id])
+}
+// CarFeature model
+model CarFeature {
+  id                Int      @id @default(autoincrement())
+  transmission      String?
+  cruiseControl     Boolean  @default(false)
+  engineCapacity    String?
+  luggageBootCapacity String?
+  engineSize        String?
+  bluetooth         String?
+  aux               String?
+  seater            String?
+  navigation        String?
+  parkingSense      String?
+  appleCarPlay      Boolean  @default(false)
+  isoFix            Boolean  @default(false)
+  sunRoof           Boolean  @default(false)
+  pushButton        Boolean  @default(false)
+  lcd               Boolean  @default(false)
+  rearCamera        Boolean  @default(false)
+}
